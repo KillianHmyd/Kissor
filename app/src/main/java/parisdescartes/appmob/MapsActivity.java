@@ -84,16 +84,14 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.setMyLocationEnabled(true);
 
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(48.8534100, 2.3488000))
-                    .title("MyHome"));
+            //TODO : Methode qui initialise tous les markers
 
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
                 @Override
                 public boolean onMarkerClick(Marker arg0) {
                     /*
-                    * ICI METTRE LES INSTRUCTIONS SI ON CLIC SUR UN MARKER (OUVRIR NOUVELLE ACTIVITE/FRAGMENT)
+                    * TODO : ICI METTRE LES INSTRUCTIONS SI ON CLIC SUR UN MARKER (OUVRIR NOUVELLE ACTIVITE/FRAGMENT)
                     * */
                     return true;
                 }

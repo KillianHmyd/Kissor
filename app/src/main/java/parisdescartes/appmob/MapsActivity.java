@@ -1,5 +1,6 @@
 package parisdescartes.appmob;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.graphics.Point;
 import android.location.Location;
@@ -19,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,50 +30,23 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.BreakIterator;
 
 public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private ScrollView mScrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int height = size.y;
-
-        LinearLayout layoutMap = (LinearLayout) findViewById(R.id.layoutMap);
-        ViewGroup.LayoutParams layoutMapParam = layoutMap.getLayoutParams();
-
-        layoutMapParam.height = 4*(height/6);
-
-        LinearLayout layoutField1 = (LinearLayout) findViewById(R.id.field1);
-        ViewGroup.LayoutParams layoutField1Params = layoutField1.getLayoutParams();
-
-        layoutField1Params.height = (height/6);
-
-        LinearLayout layoutField2 = (LinearLayout) findViewById(R.id.field2);
-        ViewGroup.LayoutParams layoutField2Params = layoutField2.getLayoutParams();
-
-        layoutField2Params.height = (height/6);
-
-        LinearLayout layoutField3 = (LinearLayout) findViewById(R.id.field3);
-        ViewGroup.LayoutParams layoutField3Params = layoutField3.getLayoutParams();
-
-        layoutField3Params.height = (height/6);
-
-
-
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -102,62 +77,35 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         setUpMapIfNeeded();
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
-            mMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             mMap.getUiSettings().setZoomControlsEnabled(true);
-            mScrollView = (ScrollView) findViewById(R.id.scrollView); //parent scrollview in xml, give your scrollview id value
+            mMap.setMyLocationEnabled(true);
 
-            ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .setListener(new WorkaroundMapFragment.OnTouchListener() {
-                        @Override
-                        public void onTouch() {
-                            mScrollView.requestDisallowInterceptTouchEvent(true);
-                        }
-                    });
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(48.8534100, 2.3488000))
+                    .title("MyHome"));
 
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+                @Override
+                public boolean onMarkerClick(Marker arg0) {
+                    /*
+                    * ICI METTRE LES INSTRUCTIONS SI ON CLIC SUR UN MARKER (OUVRIR NOUVELLE ACTIVITE/FRAGMENT)
+                    * */
+                    return true;
+                }
+            });
         }
-    }
-
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-    private void setUpMap() {
-        LatLng paris = new LatLng(48.866667f, 2.333333f);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(paris, 15));
     }
 
     public static void ZoomLocMap(GoogleMap mMap, double latitude, double Longitude, float nivelZoom) {
 
         try
         {
-
-            // Enabling MyLocation Layer of Google Map
-            mMap.setMyLocationEnabled(true);
-
-            //acercar a localizacion animada
             LatLng latLng = new LatLng(latitude, Longitude);
-
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, nivelZoom);
             mMap.animateCamera(cameraUpdate);
 

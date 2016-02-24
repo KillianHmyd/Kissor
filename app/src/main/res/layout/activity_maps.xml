@@ -1,48 +1,13 @@
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:id="@+id/scrollView"
     android:fillViewport="true">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="600dp"
-            android:id="@+id/layoutMap"
-            >
-
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-                android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
-                android:name="parisdescartes.appmob.WorkaroundMapFragment" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@color/wallet_bright_foreground_disabled_holo_light"
-            android:id="@+id/field1"
-            android:orientation="vertical"></LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@color/common_action_bar_splitter"
-            android:id="@+id/field2"
-            android:orientation="vertical"></LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@color/wallet_bright_foreground_disabled_holo_light"
-            android:id="@+id/field3"
-            android:orientation="vertical"></LinearLayout>
-
-    </LinearLayout>
-
-</ScrollView>
+</RelativeLayout>

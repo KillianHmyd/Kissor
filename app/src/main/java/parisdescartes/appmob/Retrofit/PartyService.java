@@ -16,7 +16,7 @@ import retrofit.http.Query;
  */
 
 public interface PartyService {
-    public static final String ENDPOINT = "";
+    public static final String ENDPOINT = "http://192.168.1.26:8080/api";
 
     @GET("/user")
     void getUser(@Query("userid") int userid, @Header("TOKEN") String tokenFacebook, Callback<User> callback);

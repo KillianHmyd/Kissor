@@ -12,8 +12,7 @@ public class PartyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_party);
         Bundle extras = getIntent().getExtras();
-        int idParty = extras.getInt("idParty");
-
+        int idParty = extras.getInt("idEvent");
     }
 
     @Override

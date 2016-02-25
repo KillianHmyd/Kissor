@@ -2,7 +2,9 @@ package parisdescartes.appmob;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
@@ -67,10 +69,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         }
         setUpMapIfNeeded();
         setUpMarker();
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(48.866667, 2.333333))
-                .title("PARIS"));
-
     }
 
     @Override
@@ -104,10 +102,9 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 
                 @Override
                 public boolean onMarkerClick(Marker arg0) {
-                    /*
-                    * TODO : ICI METTRE LES INSTRUCTIONS SI ON CLIC SUR UN MARKER (OUVRIR NOUVELLE ACTIVITE/FRAGMENT)
-                    * */
-
+                    Intent intent = new Intent(getContext(), PartyActivity.class);
+                    intent.putExtra("idEvent", arg0.getTitle());
+                    startActivity(intent);
                     return true;
                 }
             });
@@ -126,6 +123,10 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         {
             Log.i("LogsAndroid", "NullPointerException");
         }
+    }
+
+    public Context getContext(){
+        return this;
     }
 
     public void setUpMarker(){
@@ -147,7 +148,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 
             @Override
             public void failure(RetrofitError error) {
-
+                errorDialog("Impossible de récupérer les évennements");
             }
         });
 
@@ -195,6 +196,19 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    public void errorDialog(String message){
+        AlertDialog alertDialog = new AlertDialog.Builder(MapsActivity.this).create();
+        alertDialog.setTitle("Erreur");
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
 }

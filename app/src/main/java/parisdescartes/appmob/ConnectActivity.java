@@ -135,6 +135,7 @@ public class ConnectActivity extends Activity {
                             @Override
                             public void failure(RetrofitError error) {
                                 progress.dismiss();
+                                LoginManager.getInstance().logOut();
                                 errorDialog("Erreur : \n"+error.toString());
                             }
                         });
@@ -151,11 +152,13 @@ public class ConnectActivity extends Activity {
 
             @Override
             public void onCancel() {
+                LoginManager.getInstance().logOut();
                 errorDialog("Connexion annulée.");
             }
 
             @Override
             public void onError(FacebookException e) {
+                LoginManager.getInstance().logOut();
                 errorDialog("Connexion impossible. Veuillez ressayer.");
             }
         });

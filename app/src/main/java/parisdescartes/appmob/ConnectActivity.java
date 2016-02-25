@@ -34,6 +34,14 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.Map;
 
+import parisdescartes.appmob.Retrofit.PartyService;
+import parisdescartes.appmob.Retrofit.User;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
+
 public class ConnectActivity extends Activity {
 
     private LoginButton loginButton;
@@ -107,20 +115,30 @@ public class ConnectActivity extends Activity {
 
                     @Override
                     public void onCompleted(final JSONObject jsonObject, GraphResponse graphResponse) {
-                        try {
-                            sharedpreferences.edit().putString("idUser", jsonObject.getString("id")).commit();
-                            sharedpreferences.edit().putString("firstname", jsonObject.getString("first_name")).commit();
-                            sharedpreferences.edit().putString("lastname", jsonObject.getString("last_name")).commit();
-                            sharedpreferences.edit().putString("email", jsonObject.getString("email")).commit();
-                            sharedpreferences.edit().putString("gender", jsonObject.getString("gender")).commit();
-                            sharedpreferences.edit().putString("birthday", jsonObject.getString("birthday").toString()).commit();
-                            sharedpreferences.edit().putString("picture", jsonObject.getString("picture")).commit();
-                            progress.dismiss();
-                            Intent intent = new Intent(getContext(), MapsActivity.class);
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            errorDialog("Erreur : \n"+e.toString());
-                        }
+                        PartyService partyService = new RestAdapter.Builder().
+                                setEndpoint(PartyService.ENDPOINT).
+                                build().
+                                create(PartyService.class);
+
+                        partyService.getUser(AccessToken.getCurrentAccessToken().getToken(), new Callback<User>() {
+                            @Override
+                            public void success(User user, Response response) {
+                                progress.dismiss();
+
+                                //TODO : Mettre dans la base de données locale
+
+                                sharedpreferences.edit().putString("idUser", user.getUserid()).commit();
+                                Intent intent = new Intent(getContext(), MapsActivity.class);
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                progress.dismiss();
+                                errorDialog("Erreur : \n"+error.toString());
+                            }
+                        });
+
                     }
                 });
 

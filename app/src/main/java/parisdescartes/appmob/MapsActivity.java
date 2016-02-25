@@ -2,6 +2,7 @@ package parisdescartes.appmob;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -36,6 +38,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.BreakIterator;
+import java.util.List;
+
+import parisdescartes.appmob.Retrofit.Event;
+import parisdescartes.appmob.Retrofit.PartyService;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
 
@@ -56,6 +66,10 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                     .build();
         }
         setUpMapIfNeeded();
+        setUpMarker();
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(48.866667, 2.333333))
+                .title("PARIS"));
 
     }
 
@@ -93,17 +107,18 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                     /*
                     * TODO : ICI METTRE LES INSTRUCTIONS SI ON CLIC SUR UN MARKER (OUVRIR NOUVELLE ACTIVITE/FRAGMENT)
                     * */
+
                     return true;
                 }
             });
         }
     }
 
-    public static void ZoomLocMap(GoogleMap mMap, double latitude, double Longitude, float nivelZoom) {
+    public static void ZoomLocMap(GoogleMap mMap, double latitude, double longitude, float nivelZoom) {
 
         try
         {
-            LatLng latLng = new LatLng(latitude, Longitude);
+            LatLng latLng = new LatLng(latitude, longitude);
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, nivelZoom);
             mMap.animateCamera(cameraUpdate);
 
@@ -111,6 +126,31 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         {
             Log.i("LogsAndroid", "NullPointerException");
         }
+    }
+
+    public void setUpMarker(){
+        PartyService partyService = new RestAdapter.Builder().
+                setEndpoint(PartyService.ENDPOINT).
+                build().
+                create(PartyService.class);
+        partyService.getEvent(AccessToken.getCurrentAccessToken().getToken(), new Callback<List<Event>>() {
+            @Override
+            public void success(List<Event> events, Response response) {
+                for(Event e : events){
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(e.getLatitude(), e.getLongitude()))
+                            .title(String.valueOf(e.getEventid())));
+
+                    //TODO : Rajouter l'event dans la BDD sql lite
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+
     }
 
     @Override
@@ -135,7 +175,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         mp.title("my position");
         mp.flat(true);
         mMap.addMarker(mp);
-        ZoomLocMap(mMap, mLastLocation.getLatitude(), mLastLocation.getLongitude(), 15);
     }
 
     @Override

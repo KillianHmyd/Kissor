@@ -7,15 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -28,19 +23,16 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.Map;
 
-import parisdescartes.appmob.Retrofit.PartyService;
-import parisdescartes.appmob.Retrofit.User;
+import parisdescartes.appmob.Retrofit.KissorService;
+import parisdescartes.appmob.Item.User;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
 
 public class ConnectActivity extends Activity {
 
@@ -115,19 +107,19 @@ public class ConnectActivity extends Activity {
 
                     @Override
                     public void onCompleted(final JSONObject jsonObject, GraphResponse graphResponse) {
-                        PartyService partyService = new RestAdapter.Builder().
-                                setEndpoint(PartyService.ENDPOINT).
+                        KissorService kissorService = new RestAdapter.Builder().
+                                setEndpoint(KissorService.ENDPOINT).
                                 build().
-                                create(PartyService.class);
+                                create(KissorService.class);
 
-                        partyService.getUser(AccessToken.getCurrentAccessToken().getToken(), new Callback<User>() {
+                        kissorService.getUser(AccessToken.getCurrentAccessToken().getToken(), new Callback<User>() {
                             @Override
                             public void success(User user, Response response) {
                                 progress.dismiss();
 
                                 //TODO : Mettre dans la base de données locale
 
-                                sharedpreferences.edit().putString("idUser", user.getUserid()).commit();
+                                sharedpreferences.edit().putLong("idUser", user.getUserid()).commit();
                                 Intent intent = new Intent(getContext(), MapsActivity.class);
                                 startActivity(intent);
                             }
@@ -136,7 +128,7 @@ public class ConnectActivity extends Activity {
                             public void failure(RetrofitError error) {
                                 progress.dismiss();
                                 LoginManager.getInstance().logOut();
-                                errorDialog("Erreur : \n"+error.toString());
+                                errorDialog("Erreur : \n" + error.toString());
                             }
                         });
 

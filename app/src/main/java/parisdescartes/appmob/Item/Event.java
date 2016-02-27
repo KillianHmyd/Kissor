@@ -1,34 +1,32 @@
-package parisdescartes.appmob.Retrofit;
-
-import java.sql.Date;
+package parisdescartes.appmob.Item;
 
 /**
  * Created by Killian on 25/02/2016.
  */
 public class Event {
-    private int eventid;
-    private int created_by;
+    private String _id;
+    private long created_by;
     private double latitude;
     private double longitude;
-    private Date date;
+    private String date;
 
-    public Event(int eventid, int created_by, double latitude, double longitude, Date date) {
-        this.eventid = eventid;
+    public Event(String eventid, long created_by, double latitude, double longitude, String date) {
+        this._id = eventid;
         this.created_by = created_by;
         this.latitude = latitude;
         this.longitude = longitude;
         this.date = date;
     }
 
-    public int getEventid() {
-        return eventid;
+    public String get_id() {
+        return _id;
     }
 
-    public void setEventid(int eventid) {
-        this.eventid = eventid;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public int getCreated_by() {
+    public long getCreated_by() {
         return created_by;
     }
 
@@ -52,11 +50,11 @@ public class Event {
         this.longitude = longitude;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

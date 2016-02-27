@@ -1,4 +1,4 @@
-package parisdescartes.appmob.Retrofit;
+package parisdescartes.appmob.Item;
 
 import java.util.List;
 
@@ -6,23 +6,23 @@ import java.util.List;
  * Created by Killian on 25/02/2016.
  */
 public class User {
-    private String userid;
+    private long userid;
     private String first_name;
     private String last_name;
     private String photo_url;
 
-    public User(String userid, String first_name, String last_name, String photo_url) {
+    public User(long userid, String first_name, String last_name, String photo_url) {
         this.userid = userid;
         this.first_name = first_name;
         this.last_name = last_name;
         this.photo_url = photo_url;
     }
 
-    public String getUserid() {
+    public long getUserid() {
         return userid;
     }
 
-    public void setUserid(String userid) {
+    public void setUserid(int userid) {
         this.userid = userid;
     }
 

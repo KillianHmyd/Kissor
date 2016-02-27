@@ -1,18 +1,22 @@
 package parisdescartes.appmob;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
-public class PartyActivity extends AppCompatActivity {
+public class PartyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_party);
         Bundle extras = getIntent().getExtras();
-        int idParty = extras.getInt("idEvent");
+        String idParty = extras.getString("idEvent");
+        TextView textIdEvent = (TextView) findViewById(R.id.idParty);
+        textIdEvent.setText(idParty);
     }
 
     @Override

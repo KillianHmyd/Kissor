@@ -53,7 +53,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("create table " + TABLE_PARTICIPATION + " ("
                 + COL_EVENT + " INTEGER NOT NULL,"
-                + COL_USER + " INTEGER NOT NULL");
+                + COL_USER + " INTEGER NOT NULL,"
+                + "FOREIGN KEY(" + COL_EVENT + ") REFERENCES " + TABLE_EVENT + "(" + COL_REF + "),"
+                + "FOREIGN KEY(" + COL_USER + ") REFERENCES " + TABLE_USER + "(" + COL_ID + ")");
     }
 
     @Override
@@ -134,14 +136,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /* Renvoie les events auquel un user participe */
     public Cursor getEventsByUser(int id_user){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_EVENT+ ", "+ TABLE_PARTICIPATION + " WHERE " + id_user + "=" + COL_USER , null);
+        //Cursor res = db.rawQuery("select * from " + TABLE_EVENT+ ", "+ TABLE_PARTICIPATION + " WHERE " + id_user + "=" + COL_USER , null);
+        Cursor res = db.rawQuery("select * from " + TABLE_EVENT+ ", "+ TABLE_PARTICIPATION + " WHERE " + COL_USER  + " = ?", new String[] {id_user + ""});
         return res;
     }
 
     /*Renvoie les participants à un event donné*/
     public Cursor getUsersByEvent(int ref_event){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + ref_event + "=" + COL_EVENT , null);
+        //Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + ref_event + "=" + COL_EVENT , null);
+        Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + COL_EVENT + " = ?", new String[] {ref_event + ""});
         return res;
     }
+
+    /*Supression de tous les events de la table event*/
+    public Integer deleteAllEvents(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_EVENT, "1", null);
+    }
+
+    /*Supression de toutes les participations*/
+    public Integer deleteAllParticipations(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_PARTICIPATION, "1", null);
+    }
+
+    /*Supression de tous les Users*/
+    public Integer deleteAllUsers(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_USER, "1", null);
+    }
+
+    /*Supression d'un event en particulier*/
+    public Integer deleteEvent(int ref_event){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_EVENT, COL_REF + " = ?", new String[] {ref_event +""});
+    }
+
+    /*Supression d'un user en particulier*/
+    public Integer deleteUser(int id_user){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_USER, COL_ID + " = ?", new String[] {id_user +""});
+    }
+
 }

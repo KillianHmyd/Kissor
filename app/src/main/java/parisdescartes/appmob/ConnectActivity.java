@@ -29,11 +29,20 @@ import java.util.Arrays;
 
 import parisdescartes.appmob.Retrofit.KissorService;
 import parisdescartes.appmob.Item.User;
+import parisdescartes.appmob.database.DatabaseHelper;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+/**
+ * Version modifiée le 28/02/2016 à 1h50 par Yassin HASSAN
+ * 1 - Ajout de la variable myDb
+ * 2 - Initialisation de la variable myDb dans la méthode onCreate()
+ * 3 - Dans la callback de la methode onCompleted , insertion du user créé dans la base de donnée myDb
+ *
+ * NB : les id des users sont des int dans la base de données et des long dans le ConnectActivity
+ */
 public class ConnectActivity extends Activity {
 
     private LoginButton loginButton;
@@ -41,8 +50,11 @@ public class ConnectActivity extends Activity {
     private ProgressDialog progress;
     private SharedPreferences sharedpreferences;
 
+    DatabaseHelper myDb;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        myDb = new DatabaseHelper(this);
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -118,6 +130,7 @@ public class ConnectActivity extends Activity {
                                 progress.dismiss();
 
                                 //TODO : Mettre dans la base de données locale
+                                myDb.insertUser((int)user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());
 
                                 sharedpreferences.edit().putLong("idUser", user.getUserid()).commit();
                                 Intent intent = new Intent(getContext(), MapsActivity.class);

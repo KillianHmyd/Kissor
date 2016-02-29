@@ -56,7 +56,7 @@ public class ConnectActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         myDb = ((Application)getApplication()).getDb();
-        myDb = new DatabaseHelper(this);
+        //myDb = new DatabaseHelper(this);
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -132,7 +132,7 @@ public class ConnectActivity extends Activity {
                                 progress.dismiss();
 
                                 //TODO : Mettre dans la base de données locale
-                                myDb.insertUser((int)user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());
+                                myDb.insertUser(user);
 
                                 sharedpreferences.edit().putLong("idUser", user.getUserid()).commit();
                                 Intent intent = new Intent(getContext(), MapsActivity.class);

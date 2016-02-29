@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import parisdescartes.appmob.Item.Event;
+import parisdescartes.appmob.Item.User;
+
 /**
  * Created by Yassin on 25/02/2016.
  */
@@ -39,7 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + TABLE_EVENT + " ("
-                +COL_REF+ " INTEGER PRIMARY KEY,"
+                +COL_REF+ " TEXT PRIMARY KEY,"
                 +COL_CREATOR+" INTEGER NOT NULL,"
                 +COL_LATITUDE+" REAL NOT NULL,"
                 +COL_LONGITUDE+" REAL NOT NULL,"
@@ -66,7 +69,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertUser(int user_id, String first_name, String last_name, String photo_url){
+    /*** *** *** *** *** INSERTION *** *** *** *** ***/
+    public boolean insertUser_data(long user_id, String first_name, String last_name, String photo_url){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_ID, user_id);
@@ -82,7 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean insertEvent(int ref, int creator, float latitude, float longitude, String date){
+    public boolean insertEvent_data(String ref, long creator, double latitude, double longitude, String date){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_REF, ref);
@@ -99,7 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean insertParticipation(int ref_event, int id_user){
+    public boolean insertParticipation_data(String ref_event, long id_user){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_EVENT, ref_event);
@@ -115,43 +119,86 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /*public Cursor getData(){
+    /*** *** *** *** *** MODIFICATION *** *** *** *** ***/
+    public boolean updateUser_data(long id_user, String first_name, String last_name, String photo_url){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
-        return res;
-    }*/
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_ID, id_user);
+        contentValues.put(COL_FIRST_NAME, first_name);
+        contentValues.put(COL_LAST_NAME, last_name);
+        contentValues.put(COL_PICTURE, photo_url);
 
+        long result = db.update(TABLE_USER, contentValues, "ID = ?", new String[]{id_user + ""});
+        if(result == -1){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public boolean updateEvent_data(String ref_event, long creator, double latitude, double longitude, String date){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_REF, ref_event);
+        contentValues.put(COL_CREATOR, creator);
+        contentValues.put(COL_LATITUDE, latitude);
+        contentValues.put(COL_LONGITUDE, longitude);
+        contentValues.put(COL_DATE, date);
+
+        long result = db.update(TABLE_EVENT, contentValues, "ID = ?", new String[]{ref_event + ""});
+        if(result == -1){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    /*** *** *** *** *** SELECTION *** *** *** *** ***/
     /* Renvoie tous les events */
-    public Cursor getAllEvents(){
+    public Cursor getAllEvents_data(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("select * from " + TABLE_EVENT, null);
         return res;
     }
 
     /* Renvoie tous les users */
-    public Cursor getAllUsers(){
+    public Cursor getAllUsers_data(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("select * from " + TABLE_USER, null);
         return res;
     }
 
+    /* Renvoie un event */
+    public Cursor getEvent_data(String ref_event){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_EVENT + " WHERE " + COL_REF + " = ?",  new String[] {ref_event + ""});
+        return res;
+    }
+
+    /* Renvoie un user */
+    public Cursor getUser_data(long id_user){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_USER + " WHERE " + COL_ID + " = ?",  new String[] {id_user + ""});
+        return res;
+    }
+
     /* Renvoie les events auquel un user participe */
-    public Cursor getEventsByUser(int id_user){
+    public Cursor getEventsByUser_data(long id_user){
         SQLiteDatabase db = this.getWritableDatabase();
         //Cursor res = db.rawQuery("select * from " + TABLE_EVENT+ ", "+ TABLE_PARTICIPATION + " WHERE " + id_user + "=" + COL_USER , null);
         Cursor res = db.rawQuery("select * from " + TABLE_EVENT+ ", "+ TABLE_PARTICIPATION + " WHERE " + COL_USER  + " = ?", new String[] {id_user + ""});
         return res;
     }
-    
+
     /*Renvoie les participants ï¿½ un event donnï¿½*/
-    /*Renvoie les participants ï¿½ un event donnï¿½*/
-    public Cursor getUsersByEvent(int ref_event){
+    public Cursor getUsersByEvent_data(String ref_event){
         SQLiteDatabase db = this.getWritableDatabase();
         //Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + ref_event + "=" + COL_EVENT , null);
         Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + COL_EVENT + " = ?", new String[] {ref_event + ""});
         return res;
     }
 
+    /*** *** *** *** *** SUPPRESSION *** *** *** *** ***/
     /*Supression de tous les events de la table event*/
     public Integer deleteAllEvents(){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -171,15 +218,98 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /*Supression d'un event en particulier*/
-    public Integer deleteEvent(int ref_event){
+    public Integer deleteEvent(String ref_event){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_EVENT, COL_REF + " = ?", new String[] {ref_event +""});
     }
 
     /*Supression d'un user en particulier*/
-    public Integer deleteUser(int id_user){
+    public Integer deleteUser(long id_user){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_USER, COL_ID + " = ?", new String[] {id_user +""});
     }
 
+    /*** *** *** *** *** ACCESSEURS OBJET *** *** *** *** ***/
+    public User getUser (long id_user){
+        Cursor res = this.getUser_data(id_user);
+        if(res.getCount() == 0){
+            //show message "AUCUN USER CORREPONDANT A CET ID
+            return null;
+        }
+
+        User user = new User(
+                res.getLong(0),
+                res.getString(1),
+                res.getString(2),
+                res.getString(3)
+        );
+        return user;
+    }
+
+    public Event getEvent (String ref_event){
+        Cursor res = this.getEvent_data(ref_event);
+        if(res.getCount() == 0){
+            //show message "AUCUN EVENT CORREPONDANT A CET REF
+            return null;
+        }
+
+        Event event = new Event(
+                res.getString(0),
+                res.getLong(1),
+                res.getDouble(2),
+                res.getDouble(3),
+                res.getString(4)
+        );
+        return event;
+    }
+
+    /*** *** *** *** *** AJOUT ET MISE A JOUR - USER OBJET *** *** *** *** ***/
+    public void insertUser(User user){
+        this.insertUser_data(user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());
+    }
+
+    public void updateUser(User user){
+        this.updateUser_data(user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());
+    }
+
+    /**
+     * Ajoute un user s'il n'est pas présent dans la base de données
+     * sinon, il met à jour l'utlisateur déjà présent dans la base de données
+     * @param user : l'utilisateur à ajouter ou à mettre à jour
+     */
+    public void addUser (User user){
+        Cursor res = this.getUser_data(user.getUserid());
+        if(res.getCount() == 0){
+            //ALORS INSERTION
+            this.insertUser(user);
+        }else{
+            //SINON MISE A JOUR
+            this.updateUser(user);
+        }
+    }
+
+    /*** *** *** *** *** AJOUT ET MISE A JOUR - EVENT OBJET *** *** *** *** ***/
+    public void insertEvent(Event event){
+        this.insertEvent_data(event.get_id(), event.getCreated_by(), event.getLatitude(), event.getLongitude(), event.getDate());
+    }
+
+    public void updateEvent(Event event){
+        this.updateEvent_data(event.get_id(), event.getCreated_by(), event.getLatitude(), event.getLongitude(), event.getDate());
+    }
+
+    /**
+     * Ajoute un event s'il n'est pas présent dans la base de données
+     * sinon, il met à jour l'event déjà présent dans la base de données
+     * @param event : l'event à ajouter ou à mettre à jour
+     */
+    public void addEvent (Event event){
+        Cursor res = this.getEvent_data(event.get_id());
+        if(res.getCount() == 0){
+            //ALORS INSERTION
+            this.insertEvent(event);
+        }else{
+            //SINON MISE A JOUR
+            this.updateEvent(event);
+        }
+    }
 }

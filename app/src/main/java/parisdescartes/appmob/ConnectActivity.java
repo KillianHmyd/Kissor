@@ -34,6 +34,7 @@ import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.HEAD;
 
 /**
  * Version modifiée le 28/02/2016 à 1h50 par Yassin HASSAN
@@ -55,6 +56,7 @@ public class ConnectActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         myDb = ((Application)getApplication()).getDb();
+        myDb = new DatabaseHelper(this);
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();

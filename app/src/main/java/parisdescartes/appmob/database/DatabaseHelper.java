@@ -102,13 +102,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean insertParticipation(int ref_event, int id_user){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-<<<<<<< HEAD
         contentValues.put(COL_EVENT, ref_event);
         contentValues.put(COL_USER, id_user);
-=======
-        contentValues.put(COL_EVENT, ref);
-        contentValues.put(COL_USER, user);
->>>>>>> 303e9f3517aebef569fce3ebbd50ae32747bf3d5
+        contentValues.put(COL_EVENT, ref_event);
+        contentValues.put(COL_USER, id_user);
 
         long result = db.insert(TABLE_PARTICIPATION, null, contentValues);
         if(result == -1){
@@ -145,12 +142,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor res = db.rawQuery("select * from " + TABLE_EVENT+ ", "+ TABLE_PARTICIPATION + " WHERE " + COL_USER  + " = ?", new String[] {id_user + ""});
         return res;
     }
-
-<<<<<<< HEAD
+    
     /*Renvoie les participants ï¿½ un event donnï¿½*/
-=======
-    /*Renvoie les participants à un event donné*/
->>>>>>> 303e9f3517aebef569fce3ebbd50ae32747bf3d5
+    /*Renvoie les participants ï¿½ un event donnï¿½*/
     public Cursor getUsersByEvent(int ref_event){
         SQLiteDatabase db = this.getWritableDatabase();
         //Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + ref_event + "=" + COL_EVENT , null);

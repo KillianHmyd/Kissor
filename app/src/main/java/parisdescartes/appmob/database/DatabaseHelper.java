@@ -52,13 +52,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 +COL_ID+ " INTEGER PRIMARY KEY,"
                 +COL_FIRST_NAME+" TEXT NOT NULL,"
                 +COL_LAST_NAME+" TEXT NOT NULL,"
-                +COL_PICTURE+" TEXT NOT NULL");
+                +COL_PICTURE+" TEXT NOT NULL)");
 
         db.execSQL("create table " + TABLE_PARTICIPATION + " ("
                 + COL_EVENT + " INTEGER NOT NULL,"
                 + COL_USER + " INTEGER NOT NULL,"
                 + "FOREIGN KEY(" + COL_EVENT + ") REFERENCES " + TABLE_EVENT + "(" + COL_REF + "),"
-                + "FOREIGN KEY(" + COL_USER + ") REFERENCES " + TABLE_USER + "(" + COL_ID + ")");
+                + "FOREIGN KEY(" + COL_USER + ") REFERENCES " + TABLE_USER + "(" + COL_ID + "))");
     }
 
     @Override
@@ -265,6 +265,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /*** *** *** *** *** AJOUT ET MISE A JOUR - USER OBJET *** *** *** *** ***/
     public void insertUser(User user){
+        System.out.println("ID User insÃ©rÃ© : " + user.getUserid());
         this.insertUser_data(user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());
     }
 
@@ -273,9 +274,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Ajoute un user s'il n'est pas présent dans la base de données
-     * sinon, il met à jour l'utlisateur déjà présent dans la base de données
-     * @param user : l'utilisateur à ajouter ou à mettre à jour
+     * Ajoute un user s'il n'est pas prï¿½sent dans la base de donnï¿½es
+     * sinon, il met ï¿½ jour l'utlisateur dï¿½jï¿½ prï¿½sent dans la base de donnï¿½es
+     * @param user : l'utilisateur ï¿½ ajouter ou ï¿½ mettre ï¿½ jour
      */
     public void addUser (User user){
         Cursor res = this.getUser_data(user.getUserid());
@@ -298,9 +299,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Ajoute un event s'il n'est pas présent dans la base de données
-     * sinon, il met à jour l'event déjà présent dans la base de données
-     * @param event : l'event à ajouter ou à mettre à jour
+     * Ajoute un event s'il n'est pas prï¿½sent dans la base de donnï¿½es
+     * sinon, il met ï¿½ jour l'event dï¿½jï¿½ prï¿½sent dans la base de donnï¿½es
+     * @param event : l'event ï¿½ ajouter ou ï¿½ mettre ï¿½ jour
      */
     public void addEvent (Event event){
         Cursor res = this.getEvent_data(event.get_id());

@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.v4.app.Fragment;
@@ -39,12 +40,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import parisdescartes.appmob.Item.Event;
+import parisdescartes.appmob.Item.User;
 import parisdescartes.appmob.Retrofit.KissorService;
 import parisdescartes.appmob.Retrofit.ResponseEvents;
+import parisdescartes.appmob.database.DatabaseHelper;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -62,11 +67,18 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
 
+    SharedPreferences sharedPreferences;
+    private DatabaseHelper db;
+    private User user;
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = getSharedPreferences("USER", Context.MODE_PRIVATE);
+        db = ((Application)getApplication()).getDb();
+        System.out.println("Id user cherché : " + sharedPreferences.getLong("idUser", 0));
+        user = db.getUser(sharedPreferences.getLong("idUser", 0));
         setContentView(R.layout.activity_maps);
 
         if (mGoogleApiClient == null) {
@@ -85,6 +97,10 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         mNavItems.add(new NavItem("About", "Get to know about us", R.drawable.ic_info_black_48dp));
 
         //TODO SET ImageView + Name profil
+        TextView userName = (TextView) findViewById(R.id.userName);
+        ImageView avatar = (ImageView) findViewById(R.id.avatar);
+
+        userName.setText(user.getFirst_name());
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);

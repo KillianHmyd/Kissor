@@ -132,8 +132,8 @@ public class ConnectActivity extends Activity {
                                 progress.dismiss();
 
                                 //TODO : Mettre dans la base de données locale
+                                System.out.println(user.getFirst_name());
                                 myDb.insertUser(user);
-
                                 sharedpreferences.edit().putLong("idUser", user.getUserid()).commit();
                                 Intent intent = new Intent(getContext(), MapsActivity.class);
                                 startActivity(intent);

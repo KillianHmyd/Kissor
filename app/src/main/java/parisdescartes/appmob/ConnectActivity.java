@@ -96,7 +96,7 @@ public class ConnectActivity extends Activity {
 
     public void fbConnect() {
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions(Arrays.asList("public_profile, email, user_birthday"));
+        loginButton.setReadPermissions(Arrays.asList("public_profile, email, user_birthday, user_friends"));
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -132,7 +132,6 @@ public class ConnectActivity extends Activity {
                                 progress.dismiss();
 
                                 //TODO : Mettre dans la base de données locale
-                                System.out.println(user.getFirst_name());
                                 myDb.insertUser(user);
                                 sharedpreferences.edit().putLong("idUser", user.getUserid()).commit();
                                 Intent intent = new Intent(getContext(), MapsActivity.class);

@@ -1,22 +1,33 @@
 package parisdescartes.appmob;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class PartyActivity extends Activity {
+import parisdescartes.appmob.Item.Event;
+import parisdescartes.appmob.Item.User;
+import parisdescartes.appmob.database.DatabaseHelper;
+
+public class EventActivity extends Activity {
+
+    DatabaseHelper db;
+    Event event;
+    User creator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_party);
+        setContentView(R.layout.activity_event);
+        db = ((Application)getApplication()).getDb();
         Bundle extras = getIntent().getExtras();
-        String idParty = extras.getString("idEvent");
-        TextView textIdEvent = (TextView) findViewById(R.id.idParty);
-        textIdEvent.setText(idParty);
+        String idEvent = extras.getString("idEvent");
+        event = db.getEvent(idEvent);
+        System.out.println("Created y : " + event.getCreated_by());
+        creator = db.getUser(event.getCreated_by());
+        TextView textIdEvent = (TextView) findViewById(R.id.creatorName);
+        textIdEvent.setText(R.string.event_organiser + creator.getFirst_name() + " " + creator.getLast_name());
     }
 
     @Override

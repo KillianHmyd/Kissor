@@ -39,8 +39,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.w3c.dom.Text;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +76,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences("USER", Context.MODE_PRIVATE);
         db = ((Application)getApplication()).getDb();
-        System.out.println("Id user cherché : " + sharedPreferences.getLong("idUser", 0));
         user = db.getUser(sharedPreferences.getLong("idUser", 0));
         setContentView(R.layout.activity_maps);
 
@@ -99,6 +97,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         //TODO SET ImageView + Name profil
         TextView userName = (TextView) findViewById(R.id.userName);
         ImageView avatar = (ImageView) findViewById(R.id.avatar);
+        Picasso.with(this).load(user.getPhoto_url()).into(avatar);
 
         userName.setText(user.getFirst_name());
 
@@ -206,7 +205,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
 
                 @Override
                 public boolean onMarkerClick(Marker arg0) {
-                    Intent intent = new Intent(getContext(), PartyActivity.class);
+                    Intent intent = new Intent(getContext(), EventActivity.class);
+                    System.out.println(arg0.getTitle());
                     intent.putExtra("idEvent", arg0.getTitle());
                     startActivity(intent);
                     return true;
@@ -258,12 +258,11 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             public void success(ResponseEvents responseEvents, Response response) {
                 List<Event> events = responseEvents.getEvents();
                 for(Event e : events){
-                    System.out.println("ici");
                     mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(e.getLatitude(), e.getLongitude()))
                             .title(String.valueOf(e.get_id())));
 
-                    //TODO : Rajouter l'event dans la BDD sql lite
+                    db.addEvent(e);
                 }
                 progress.dismiss();
             }

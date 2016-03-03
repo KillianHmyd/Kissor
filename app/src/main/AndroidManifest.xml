@@ -51,7 +51,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PartyActivity"
+            android:name=".EventActivity"
             android:label="@string/title_activity_party"
             android:theme="@style/PartyTheme"
             android:parentActivityName=".MapsActivity" >

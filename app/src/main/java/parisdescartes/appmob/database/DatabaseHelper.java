@@ -145,7 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_LONGITUDE, longitude);
         contentValues.put(COL_DATE, date);
 
-        long result = db.update(TABLE_EVENT, contentValues, "ID = ?", new String[]{ref_event + ""});
+        long result = db.update(TABLE_EVENT, contentValues, "REF = ?", new String[]{ref_event + ""});
         if(result == -1){
             return false;
         }else{
@@ -194,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getUsersByEvent_data(String ref_event){
         SQLiteDatabase db = this.getWritableDatabase();
         //Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + ref_event + "=" + COL_EVENT , null);
-        Cursor res = db.rawQuery("select * from " + TABLE_USER + ", "+ TABLE_PARTICIPATION + " WHERE " + COL_EVENT + " = ?", new String[] {ref_event + ""});
+        Cursor res = db.rawQuery("select * from " + TABLE_USER + ", " + TABLE_PARTICIPATION + " WHERE " + COL_EVENT + " = ?", new String[]{ref_event + ""});
         return res;
     }
 
@@ -236,7 +236,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //show message "AUCUN USER CORREPONDANT A CET ID
             return null;
         }
-
+        res.moveToFirst();
         User user = new User(
                 res.getLong(0),
                 res.getString(1),
@@ -252,7 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //show message "AUCUN EVENT CORREPONDANT A CET REF
             return null;
         }
-
+        res.moveToFirst();
         Event event = new Event(
                 res.getString(0),
                 res.getLong(1),
@@ -265,7 +265,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /*** *** *** *** *** AJOUT ET MISE A JOUR - USER OBJET *** *** *** *** ***/
     public void insertUser(User user){
-        System.out.println("ID User inséré : " + user.getUserid());
         this.insertUser_data(user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());
     }
 

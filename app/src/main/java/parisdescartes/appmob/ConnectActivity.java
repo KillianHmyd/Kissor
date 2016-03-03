@@ -66,6 +66,7 @@ public class ConnectActivity extends Activity {
             Intent intent = new Intent(this, MapsActivity.class);
             startActivity(intent);
         } else {
+            ((Application) getApplication()).resetDb();
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.clear();
             editor.commit();

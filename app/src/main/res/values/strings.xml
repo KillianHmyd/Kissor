@@ -11,4 +11,8 @@
     <string name="drawer_open">Open menu</string>
     <string name="drawer_close">Close menu</string>
     <string name="event_organiser">Evenement organisé par  </string>
+    <string name="participer">Participer</string>
+    <string name="annuler">Annuler</string>
+    <string name="erreur">Erreur</string>
+    <string name="titreEvent">Evenement</string>
 </resources>

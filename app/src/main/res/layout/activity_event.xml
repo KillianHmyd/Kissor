@@ -4,12 +4,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="parisdescartes.appmob.EventActivity">
+    tools:context="parisdescartes.appmob.EventActivity"
+    android:id="@+id/">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="@string/participer"
         android:id="@+id/button"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -19,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textView"
+        android:text="@string/titreEvent"
+        android:id="@+id/titre"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -29,9 +30,45 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/event_organiser"
-        android:id="@+id/creatorName"
+        android:id="@+id/labelNom"
+        android:layout_marginTop="54dp"
         android:layout_below="@+id/textView"
+        android:layout_toEndOf="@+id/picturePorfil" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/picturePorfil"
+        android:layout_alignTop="@+id/labelNom"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="53dp" />
+        android:background="@color/com_facebook_blue"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Prénom Nom"
+        android:id="@+id/creatorName"
+        android:layout_below="@+id/labelNom"
+        android:layout_toEndOf="@+id/picturePorfil" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Adresse"
+        android:id="@+id/labelAdresse"
+        android:layout_below="@+id/picturePorfil"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="29dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="XX rue du XXXXXXXX, XXXX XXXXXX"
+        android:id="@+id/adresse"
+        android:layout_below="@+id/labelAdresse"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

@@ -199,8 +199,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.setMyLocationEnabled(true);
 
-            //TODO : Methode qui initialise tous les markers
-
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
                 @Override
@@ -258,6 +256,9 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             public void success(ResponseEvents responseEvents, Response response) {
                 List<Event> events = responseEvents.getEvents();
                 for(Event e : events){
+                    System.out.println(e.getLatitude());
+                    System.out.println(e.getLongitude());
+                    System.out.println("\n");
                     mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(e.getLatitude(), e.getLongitude()))
                             .title(String.valueOf(e.get_id())));

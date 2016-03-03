@@ -1,10 +1,19 @@
 package parisdescartes.appmob;
 
 import android.app.Activity;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import parisdescartes.appmob.Item.Event;
 import parisdescartes.appmob.Item.User;
@@ -24,10 +33,25 @@ public class EventActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         String idEvent = extras.getString("idEvent");
         event = db.getEvent(idEvent);
-        System.out.println("Created y : " + event.getCreated_by());
         creator = db.getUser(event.getCreated_by());
         TextView textIdEvent = (TextView) findViewById(R.id.creatorName);
-        textIdEvent.setText(R.string.event_organiser + creator.getFirst_name() + " " + creator.getLast_name());
+        textIdEvent.setText(creator.getFirst_name() + " " + creator.getLast_name());
+        ImageView avatar = (ImageView) findViewById(R.id.picturePorfil);
+        Picasso.with(this).load(creator.getPhoto_url()).into(avatar);
+        Geocoder geo = new Geocoder(EventActivity.this.getApplicationContext(), Locale.getDefault());
+        TextView addresse = (TextView) findViewById(R.id.adresse);
+        try {
+            List<Address> addresses = geo.getFromLocation(event.getLatitude(), event.getLongitude(), 1);
+            if (addresses.isEmpty()) {
+                addresse.setText(R.string.erreur);
+            }
+            else{
+                addresse.setText(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getPostalCode() + ", " + addresses.get(0).getCountryName());
+            }
+        } catch (IOException e) {
+            addresse.setText(e.toString());
+        }
+
     }
 
     @Override

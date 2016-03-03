@@ -8,4 +8,8 @@ public class Application extends android.app.Application {
     public DatabaseHelper getDb() {
         return db;
     }
+
+    public void resetDb(){
+        this.db=new DatabaseHelper(this);
+    }
 }

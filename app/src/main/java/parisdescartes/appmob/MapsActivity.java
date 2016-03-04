@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import parisdescartes.appmob.Item.Event;
+import parisdescartes.appmob.Item.Participation;
 import parisdescartes.appmob.Item.User;
 import parisdescartes.appmob.Retrofit.KissorService;
 import parisdescartes.appmob.Retrofit.ResponseEvents;
@@ -248,7 +249,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 // TODO Auto-generated method stub
                 if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    LoginManager.getInstance().logOut();
+
                     progress.dismiss();
                     return true;
                 }
@@ -263,16 +264,23 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             @Override
             public void success(ResponseEvents responseEvents, Response response) {
                 List<Event> events = responseEvents.getEvents();
+                ArrayList<Participation> participations = db.getParticipations(sharedPreferences.getLong("idUser", 0));
+                for (Participation p : participations) {
+                    System.out.println("ID EVENT : " + p.getEventid());
+                }
                 for (Event e : events) {
-                    System.out.println(e.getLatitude());
-                    System.out.println(e.getLongitude());
-                    System.out.println("\n");
+                    System.out.println(e.get_id());
                     if (e.getCreated_by() != user.getUserid()) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
                                 .title(String.valueOf(e.get_id())));
-                    }
-                    else{
+                    } else if (db.participe(e.get_id())) {
+                        System.out.println("Present !!!");
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(e.getLatitude(), e.getLongitude()))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                                .title(String.valueOf(e.get_id())));
+                    } else {
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))

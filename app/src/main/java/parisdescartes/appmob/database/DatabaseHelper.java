@@ -6,7 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import parisdescartes.appmob.Item.Event;
+import parisdescartes.appmob.Item.Participation;
 import parisdescartes.appmob.Item.User;
 
 /**
@@ -117,6 +121,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }else{
             return true;
         }
+    }
+
+    public void insertParticipation(Participation participation){
+        this.insertParticipation_data(participation.getEventid(), participation.getUserid());
     }
 
     /*** *** *** *** *** MODIFICATION *** *** *** *** ***/
@@ -261,6 +269,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 res.getString(4)
         );
         return event;
+    }
+
+    public Cursor getParticipations_data(long idUser){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_PARTICIPATION + " WHERE " + COL_USER + " = ?",  new String[] {idUser + ""});
+        return res;
+    }
+
+    public ArrayList<Participation> getParticipations(long userid) {
+        Cursor res = getParticipations_data(userid);
+        ArrayList<Participation> participations = new ArrayList<Participation>();
+        res.moveToFirst();
+        int i = 1;
+        while(res.moveToNext()){
+            System.out.println(i++);
+            participations.add(new Participation(res.getString(0), res.getLong(1)));
+        }
+        return participations;
+    }
+
+    public boolean participe(String idevent){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_PARTICIPATION + " WHERE " + COL_EVENT + " = ?",  new String[] {idevent + ""});
+        if(res.getCount() > 0)
+            return true;
+        else
+            return false;
     }
 
     /*** *** *** *** *** AJOUT ET MISE A JOUR - USER OBJET *** *** *** *** ***/

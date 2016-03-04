@@ -27,8 +27,10 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import parisdescartes.appmob.Item.Participation;
 import parisdescartes.appmob.Retrofit.KissorService;
 import parisdescartes.appmob.Item.User;
+import parisdescartes.appmob.Retrofit.ResponseParticipation;
 import parisdescartes.appmob.database.DatabaseHelper;
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -122,7 +124,7 @@ public class ConnectActivity extends Activity {
 
                     @Override
                     public void onCompleted(final JSONObject jsonObject, GraphResponse graphResponse) {
-                        KissorService kissorService = new RestAdapter.Builder().
+                        final KissorService kissorService = new RestAdapter.Builder().
                                 setEndpoint(KissorService.ENDPOINT).
                                 build().
                                 create(KissorService.class);
@@ -130,11 +132,24 @@ public class ConnectActivity extends Activity {
                         kissorService.getUser(AccessToken.getCurrentAccessToken().getToken(), new Callback<User>() {
                             @Override
                             public void success(User user, Response response) {
-                                progress.dismiss();
-
-                                //TODO : Mettre dans la base de données locale
                                 myDb.insertUser(user);
                                 sharedpreferences.edit().putLong("idUser", user.getUserid()).commit();
+                                kissorService.getParticipations(AccessToken.getCurrentAccessToken().getToken(), new Callback<ResponseParticipation>() {
+                                    @Override
+                                    public void success(ResponseParticipation responseParticipation, Response response) {
+                                        for (Participation p : responseParticipation.getParticipations()) {
+                                            myDb.insertParticipation(p);
+                                        }
+                                        progress.dismiss();
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        progress.dismiss();
+                                        LoginManager.getInstance().logOut();
+                                        errorDialog("Erreur : \n" + error.toString());
+                                    }
+                                });
                                 Intent intent = new Intent(getContext(), MapsActivity.class);
                                 startActivity(intent);
                             }

@@ -1,6 +1,7 @@
 package parisdescartes.appmob.Retrofit;
 
 import parisdescartes.appmob.Item.Event;
+import parisdescartes.appmob.Item.Participation;
 import parisdescartes.appmob.Item.User;
 import retrofit.Callback;
 import retrofit.http.Body;
@@ -27,6 +28,9 @@ public interface KissorService {
 
     @GET("/events")
     void getEvent(@Header("TOKEN") String tokenFacebook, Callback<ResponseEvents> callback);
+
+    @GET("/user/participation")
+    void getParticipations(@Header("TOKEN") String tokenFacebook, Callback<ResponseParticipation> callback);
 
 
 

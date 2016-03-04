@@ -36,6 +36,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -90,11 +91,11 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         setUpMarker();
 
         mNavItems.add(new NavItem("Map", "Trouve les soirées près de toi", R.drawable.ic_local_activity_black_48dp));
+        mNavItems.add(new NavItem("Supprime tes soirées", "Supprime les soirées que tu as crée", R.drawable.ic_delete_black_48dp));
         mNavItems.add(new NavItem("Créer soirée", "Crée ta soirée", R.drawable.ic_add_location_black_48dp));
-        mNavItems.add(new NavItem("Preferences", "Change your preferences", R.drawable.ic_settings_black_48dp));
-        mNavItems.add(new NavItem("About", "Get to know about us", R.drawable.ic_info_black_48dp));
+        mNavItems.add(new NavItem("Paramètres", "Modifie tes paramètres", R.drawable.ic_settings_black_48dp));
+        mNavItems.add(new NavItem("About", "A propos de nous", R.drawable.ic_info_black_48dp));
 
-        //TODO SET ImageView + Name profil
         TextView userName = (TextView) findViewById(R.id.userName);
         ImageView avatar = (ImageView) findViewById(R.id.avatar);
         Picasso.with(this).load(user.getPhoto_url()).into(avatar);
@@ -131,7 +132,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 Log.d(TAG, "onDrawerClosed: " + getTitle());
-                //TODO : OPEN ACTIVITY
+
                 invalidateOptionsMenu();
             }
         };
@@ -160,13 +161,20 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     private void selectItemFromDrawer(int position) {
-        Fragment fragment = new PreferencesFragment();
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.mainContent, fragment)
-                .commit();
-
+        switch (mNavItems.get(position).mTitle){
+            case "Créer soirée":
+                //TODO
+                break;
+            case "Supprime tes soirées":
+                //TODO
+                break;
+            case "Paramères":
+                //TODO
+                break;
+            case "About":
+                //TODO
+                break;
+        }
         mDrawerList.setItemChecked(position, true);
         setTitle(mNavItems.get(position).mTitle);
 
@@ -255,13 +263,21 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             @Override
             public void success(ResponseEvents responseEvents, Response response) {
                 List<Event> events = responseEvents.getEvents();
-                for(Event e : events){
+                for (Event e : events) {
                     System.out.println(e.getLatitude());
                     System.out.println(e.getLongitude());
                     System.out.println("\n");
-                    mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(e.getLatitude(), e.getLongitude()))
-                            .title(String.valueOf(e.get_id())));
+                    if (e.getCreated_by() != user.getUserid()) {
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(e.getLatitude(), e.getLongitude()))
+                                .title(String.valueOf(e.get_id())));
+                    }
+                    else{
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(e.getLatitude(), e.getLongitude()))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                                .title(String.valueOf(e.get_id())));
+                    }
 
                     db.addEvent(e);
                 }

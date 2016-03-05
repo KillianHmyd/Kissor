@@ -270,11 +270,13 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                 }
                 for (Event e : events) {
                     System.out.println(e.get_id());
-                    if (e.getCreated_by() != user.getUserid()) {
+                    if  (e.getCreated_by() == user.getUserid()){
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                                 .title(String.valueOf(e.get_id())));
-                    } else if (db.participe(e.get_id())) {
+                    }
+                    else if (db.participe(e.get_id())) {
                         System.out.println("Present !!!");
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
@@ -283,7 +285,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                     } else {
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                                 .title(String.valueOf(e.get_id())));
                     }
 

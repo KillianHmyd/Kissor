@@ -1,4 +1,4 @@
-# IziGo
+# Kissor
 
 Réseau social Android communiquant avec un server Node.js
 

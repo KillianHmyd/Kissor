@@ -469,7 +469,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                 alertDialog.show();
             }
         } catch (IOException e) {
-            errorDialog("Veuillez activer votre lacalisation");
+            errorDialog("Veuillez activer votre localisation");
         }
 
     }

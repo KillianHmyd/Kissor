@@ -32,6 +32,9 @@ public interface KissorService {
     @GET("/user/participation")
     void getParticipations(@Header("TOKEN") String tokenFacebook, Callback<ResponseParticipation> callback);
 
+    @POST("/participation")
+    void partcipe(@Header("TOKEN") String tokenFacebook, @Body Participation participation, Callback<Participation> callback);
+
 
 
 }

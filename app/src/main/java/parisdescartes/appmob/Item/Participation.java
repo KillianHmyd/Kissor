@@ -12,6 +12,10 @@ public class Participation {
         this.userid = userid;
     }
 
+    public Participation(String eventid) {
+        this.eventid = eventid;
+    }
+
     public String getEventid() {
         return eventid;
     }

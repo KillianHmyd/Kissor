@@ -298,6 +298,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return false;
     }
 
+    public boolean participer(String idevent, long iduser){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_EVENT, idevent);
+        contentValues.put(COL_USER, iduser);
+
+        long result = db.insert(TABLE_PARTICIPATION, null, contentValues);
+        if(result == -1){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     /*** *** *** *** *** AJOUT ET MISE A JOUR - USER OBJET *** *** *** *** ***/
     public void insertUser(User user){
         this.insertUser_data(user.getUserid(), user.getFirst_name(), user.getLast_name(), user.getPhoto_url());

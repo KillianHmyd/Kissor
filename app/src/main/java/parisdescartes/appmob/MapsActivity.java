@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.v4.app.Fragment;
@@ -26,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
@@ -42,8 +45,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import parisdescartes.appmob.Item.Event;
 import parisdescartes.appmob.Item.Participation;
@@ -72,10 +80,15 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     private DatabaseHelper db;
     private User user;
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    KissorService kissorService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        kissorService = new RestAdapter.Builder().
+                setEndpoint(KissorService.ENDPOINT).
+                build().
+                create(KissorService.class);
         sharedPreferences = getSharedPreferences("USER", Context.MODE_PRIVATE);
         db = ((Application)getApplication()).getDb();
         user = db.getUser(sharedPreferences.getLong("idUser", 0));
@@ -92,8 +105,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
         setUpMarker();
 
         mNavItems.add(new NavItem("Map", "Trouve les soirées près de toi", R.drawable.ic_local_activity_black_48dp));
-        mNavItems.add(new NavItem("Supprime tes soirées", "Supprime les soirées que tu as crée", R.drawable.ic_delete_black_48dp));
-        mNavItems.add(new NavItem("Créer soirée", "Crée ta soirée", R.drawable.ic_add_location_black_48dp));
+        mNavItems.add(new NavItem("Créer une soirée", "Créer ta soirée", R.drawable.ic_add_location_black_48dp));
         mNavItems.add(new NavItem("Paramètres", "Modifie tes paramètres", R.drawable.ic_settings_black_48dp));
         mNavItems.add(new NavItem("About", "A propos de nous", R.drawable.ic_info_black_48dp));
 
@@ -162,12 +174,10 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     private void selectItemFromDrawer(int position) {
+        System.out.println(mNavItems.get(position).mTitle);
         switch (mNavItems.get(position).mTitle){
-            case "Créer soirée":
-                //TODO
-                break;
-            case "Supprime tes soirées":
-                //TODO
+            case "Créer une soirée":
+                createEventPopup();
                 break;
             case "Paramères":
                 //TODO
@@ -177,7 +187,6 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                 break;
         }
         mDrawerList.setItemChecked(position, true);
-        setTitle(mNavItems.get(position).mTitle);
 
         // Close the drawer
         mDrawerLayout.closeDrawer(mDrawerPane);
@@ -199,6 +208,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        setUpMarker();
     }
 
     private void setUpMapIfNeeded() {
@@ -256,28 +266,20 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                 return true;
             }
         });
-        KissorService kissorService = new RestAdapter.Builder().
-                setEndpoint(KissorService.ENDPOINT).
-                build().
-                create(KissorService.class);
         kissorService.getEvent(AccessToken.getCurrentAccessToken().getToken(), new Callback<ResponseEvents>() {
             @Override
             public void success(ResponseEvents responseEvents, Response response) {
                 List<Event> events = responseEvents.getEvents();
-                ArrayList<Participation> participations = db.getParticipations(sharedPreferences.getLong("idUser", 0));
-                for (Participation p : participations) {
-                    System.out.println("ID EVENT : " + p.getEventid());
-                }
                 for (Event e : events) {
-                    System.out.println(e.get_id());
-                    if  (e.getCreated_by() == user.getUserid()){
+                    if(e.getCreated_by() == user.getUserid()){
+                        System.out.println("Present !!!");
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                                 .title(String.valueOf(e.get_id())));
                     }
                     else if (db.participe(e.get_id())) {
-                        System.out.println("Present !!!");
+
                         mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(e.getLatitude(), e.getLongitude()))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
@@ -420,5 +422,59 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             return view;
         }
     }
+
+    public void createEventPopup(){
+        final AlertDialog alertDialog = new AlertDialog.Builder(MapsActivity.this).create();
+        alertDialog.setTitle("Erreur");
+        Geocoder geo = new Geocoder(MapsActivity.this.getApplicationContext(), Locale.getDefault());
+        String addresse;
+        try {
+            List<Address> addresses = geo.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+            if (addresses.isEmpty()) {
+                errorDialog("Veuillez activer votre lacalisation");
+            }
+            else{
+                addresse = addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getPostalCode() +
+                        ", " + addresses.get(0).getCountryName();
+                alertDialog.setMessage("Voulez vous créer un événement maintenant à cette adresse :\n" +addresse);
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Oui",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Date date = Calendar.getInstance().getTime();
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+                                String dateString = sdf.format(date).toString();
+                                Event event = new Event("", user.getUserid(), mLastLocation.getLatitude(), mLastLocation.getLongitude(), dateString);
+                                kissorService.createEvent(AccessToken.getCurrentAccessToken().getToken(), event, new Callback<Event>() {
+                                    @Override
+                                    public void success(Event event, Response response) {
+                                        alertDialog.dismiss();
+                                        errorDialog("Evénement crée !");
+                                        finish();
+                                        startActivity(getIntent());
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        errorDialog("Une erreur est survenue :\n"+error.toString());
+                                    }
+                                });
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Non",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        } catch (IOException e) {
+            errorDialog("Veuillez activer votre lacalisation");
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {}
 
 }

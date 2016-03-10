@@ -2,12 +2,15 @@ package parisdescartes.appmob;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,38 +49,71 @@ public class EventActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
-        Button button = (Button) findViewById(R.id.button);
-        extras = getIntent().getExtras();
+        final ProgressDialog progress = ProgressDialog.show(this, "Connexion en cours",
+                "Veuillez patienter....", true);
+        progress.setCancelable(true);
+        progress.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                // TODO Auto-generated method stub
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+                    progress.dismiss();
+                    return true;
+                }
+                return true;
+            }
+        });
         db = ((Application)getApplication()).getDb();
+        extras = getIntent().getExtras();
         idEvent = extras.getString("idEvent");
         event = db.getEvent(idEvent);
-        creator = db.getUser(event.getCreated_by());
-        sharedPreferences = getSharedPreferences("USER", Context.MODE_PRIVATE);
-        user = db.getUser(sharedPreferences.getLong("idUser", 0));
-        if(db.participe(idEvent) ||creator.getUserid() == user.getUserid() ) {
-            button.setText("Annuler");
-        }
-        else{
-            button.setText("Participer");
-        }
-        TextView textIdEvent = (TextView) findViewById(R.id.creatorName);
-        textIdEvent.setText(creator.getFirst_name() + " " + creator.getLast_name());
-        ImageView avatar = (ImageView) findViewById(R.id.picturePorfil);
-        Picasso.with(this).load(creator.getPhoto_url()).into(avatar);
-        Geocoder geo = new Geocoder(EventActivity.this.getApplicationContext(), Locale.getDefault());
-        TextView addresse = (TextView) findViewById(R.id.adresse);
-        try {
-            List<Address> addresses = geo.getFromLocation(event.getLatitude(), event.getLongitude(), 1);
-            if (addresses.isEmpty()) {
-                addresse.setText(R.string.erreur);
-            }
-            else{
-                addresse.setText(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getPostalCode() + ", " + addresses.get(0).getCountryName());
-            }
-        } catch (IOException e) {
-            addresse.setText(e.toString());
-        }
+        KissorService kissorService = new RestAdapter.Builder().
+                setEndpoint(KissorService.ENDPOINT).
+                build().
+                create(KissorService.class);
+        kissorService.getFriendlyUser(AccessToken.getCurrentAccessToken().getToken(), event.getCreated_by(), new Callback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                db.addUser(user);
+                Button button = (Button) findViewById(R.id.button);
+                creator = db.getUser(event.getCreated_by());
+                sharedPreferences = getSharedPreferences("USER", Context.MODE_PRIVATE);
+                user = db.getUser(sharedPreferences.getLong("idUser", 0));
+                if(db.participe(idEvent) ||creator.getUserid() == user.getUserid() ) {
+                    button.setText("Annuler");
+                }
+                else{
+                    button.setText("Participer");
+                }
+                TextView textIdEvent = (TextView) findViewById(R.id.creatorName);
+                textIdEvent.setText(creator.getFirst_name() + " " + creator.getLast_name());
+                ImageView avatar = (ImageView) findViewById(R.id.picturePorfil);
+                Picasso.with(EventActivity.this).load(creator.getPhoto_url()).into(avatar);
+                Geocoder geo = new Geocoder(EventActivity.this.getApplicationContext(), Locale.getDefault());
+                TextView addresse = (TextView) findViewById(R.id.adresse);
+                try {
+                    List<Address> addresses = geo.getFromLocation(event.getLatitude(), event.getLongitude(), 1);
+                    if (addresses.isEmpty()) {
+                        addresse.setText(R.string.erreur);
+                    }
+                    else{
+                        addresse.setText(addresses.get(0).getAddressLine(0) + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getPostalCode() + ", " + addresses.get(0).getCountryName());
+                    }
+                } catch (IOException e) {
+                    addresse.setText(e.toString());
+                }
+                progress.dismiss();
 
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                errorDialog("Impossible de trouver l'organisateur de cet événement");
+                Intent intent = new Intent(EventActivity.this, MapsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -8,6 +8,7 @@ import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -15,7 +16,7 @@ import retrofit.http.Query;
  */
 
 public interface KissorService {
-    public static final String ENDPOINT = "http://192.168.1.89:8080/api";
+    public static final String ENDPOINT = "http://172.30.46.62:8080/api";
 
     @GET("/user")
     void getUser(@Query("userid") int userid, @Header("TOKEN") String tokenFacebook, Callback<User> callback);
@@ -29,11 +30,14 @@ public interface KissorService {
     @GET("/events")
     void getEvent(@Header("TOKEN") String tokenFacebook, Callback<ResponseEvents> callback);
 
-    @GET("/user/participation")
+    @GET("/participation/user")
     void getParticipations(@Header("TOKEN") String tokenFacebook, Callback<ResponseParticipation> callback);
 
     @POST("/participation")
     void partcipe(@Header("TOKEN") String tokenFacebook, @Body Participation participation, Callback<Participation> callback);
+
+    @GET("/user/{userid}")
+    void getFriendlyUser(@Header("TOKEN") String tokenFacebook, @Path("userid") long userid, Callback<User> callback);
 
 
 

@@ -179,8 +179,9 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             case "Créer une soirée":
                 createEventPopup();
                 break;
-            case "Paramères":
-                //TODO
+            case "Paramètres":
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 break;
             case "About":
                 //TODO
